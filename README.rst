@@ -13,7 +13,7 @@ Local
 
 Usage
 -----
-Take a look at the exmaples directory and put your configuration into "~/.pyt/pyt.conf".
+Take a look at the exmaples directory and put your files into "~/.pyt/".
 
 Bug Reports
 -----------
