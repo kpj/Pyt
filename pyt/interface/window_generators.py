@@ -41,12 +41,11 @@ class ChannelListWindow(object):
 		self.panel.show()
 		self.win.clear()
 
-		self.win.border(*self.theme['channel-border'])
-
 		self.win.addstr(1, 1, self.title, curses.A_UNDERLINE)
 		while True:
 			self.win.refresh()
-			curses.doupdate()
+			self.win.border(*self.theme['channel-border'])
+
 			for index, item in enumerate(self.items):
 				if index == self.pos:
 					mode = curses.A_REVERSE
@@ -56,14 +55,11 @@ class ChannelListWindow(object):
 				msg = '%s' % str(item[0])
 				self.win.addstr(3 + index, 1, msg, mode)
 
-def get_channel_list_window(stdscr):
-	return ChannelListWindow(stdscr)
-
 
 class ChatWindow(object):
 	def __init__(self, stdscr):
 		(height, width) = stdscr.getmaxyx()
-		self.win = curses.newwin(height, width - 20, 0, 25)
+		self.win = curses.newwin(height, width - 20, 0, 20)
 		self.win.immedok(True)
 
 		self.chat_history = {}
@@ -123,11 +119,13 @@ class ChatWindow(object):
 		self.input = ''
 		self.refresh_input()
 
-		self.new_message({
-			"target": self.selected_channel, 
-			"sender": "Me", 
-			"msg": tmp
-		})
+		if len(tmp) > 0:
+			self.new_message({
+				"target": self.selected_channel, 
+				"sender": "Me", 
+				"msg": tmp
+			})
+
 		return tmp
 
 	def add_char(self, char):
@@ -136,12 +134,13 @@ class ChatWindow(object):
 
 	def refresh_screen(self):
 		self.win.clear()
+
+		self.win.border(*self.theme['chat-border'])
 		self.win.addstr(
 			self.input_field_y,
-			self.input_field_x - 1 - len(self.theme["prompt"]), 
+			self.input_field_x - len(self.theme["prompt"]), 
 			self.theme["prompt"]
 		)
-		self.win.border(*self.theme['chat-border'])
 
 	def refresh_input(self):
 		self.win.addnstr(
@@ -150,5 +149,9 @@ class ChatWindow(object):
 			self.max_input_length
 		)
 
+
 def get_chat_window(stdscr):
 	return ChatWindow(stdscr)
+
+def get_channel_list_window(stdscr):
+	return ChannelListWindow(stdscr)
