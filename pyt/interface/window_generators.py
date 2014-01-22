@@ -2,6 +2,7 @@ import curses, locale
 
 from pyt.interface import utils
 from pyt.interface.structures import menu
+from pyt.config_handler import loader
 
 
 class ChannelListWindow(object):
@@ -27,10 +28,12 @@ class ChatWindow(object):
 
 		self.input = ''
 
+		self.theme = loader.load_theme()
+
 		self.max_input_length = width - 20;
 		self.input_field_x = 2
 		self.input_field_y = height - 2
-		self.win.addstr(self.input_field_y, self.input_field_x - 1, '_')
+		self.win.addstr(self.input_field_y, self.input_field_x - 1, self.theme["prompt"])
 
 		locale.setlocale(locale.LC_ALL, '')
 		self.code = locale.getpreferredencoding()
@@ -40,13 +43,13 @@ class ChatWindow(object):
 	def new_message(self, data=None):
 		if not data["target"] in self.chat_history.keys():
 			self.chat_history[data["target"]] = []
-		self.chat_history[data["target"]].insert(0, '%s: %s' % (data["sender"], data["msg"]))
+		self.chat_history[data["target"]].insert(0, self.theme["chat-line"] % (data["sender"], data["msg"]))
 		
 		self.show_all_messages()
 
 	def show_all_messages(self):
 		self.win.clear()
-		self.win.addstr(self.input_field_y, self.input_field_x - 1, '_')
+		self.win.addstr(self.input_field_y, self.input_field_x - 1, self.theme["prompt"])
 
 		if self.selected_channel in self.chat_history.keys():
 			cur_course = self.chat_history[self.selected_channel]

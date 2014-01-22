@@ -1,0 +1,2 @@
+prompt: '_'
+chat-line: '%s: %s' # nick, msg
