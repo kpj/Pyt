@@ -1,7 +1,7 @@
 import curses, locale
+from curses import panel
 
 from pyt.interface import utils
-from pyt.interface.structures import menu
 from pyt.config_handler import loader
 
 
@@ -11,8 +11,50 @@ class ChannelListWindow(object):
 		self.win = curses.newwin(height, 20, 0, 0)
 		self.win.immedok(True)
 
-		self.menu = menu.Menu('Channel list', [], self.win)
-		utils.start_thread(self.menu.display) # channel list thread
+		self.panel = panel.new_panel(self.win)
+		self.panel.hide()
+		panel.update_panels()
+
+		self.pos = 0
+		self.items = []
+		self.title = 'Channel list'
+
+		self.theme = loader.load_theme()
+
+		utils.start_thread(self.display) # new thread for channel list
+
+	def navigate(self, shift):
+		self.pos += shift
+		if self.pos < 0:
+			self.pos = 0
+		elif self.pos >= len(self.items):
+			self.pos = len(self.items) - 1
+
+	def get_selection(self):
+		return self.items[self.pos]
+
+	def add_item(self, item):
+		self.items.append(item)
+
+	def display(self):
+		self.panel.top()
+		self.panel.show()
+		self.win.clear()
+
+		self.win.border(*self.theme['channel-border'])
+
+		self.win.addstr(1, 1, self.title, curses.A_UNDERLINE)
+		while True:
+			self.win.refresh()
+			curses.doupdate()
+			for index, item in enumerate(self.items):
+				if index == self.pos:
+					mode = curses.A_REVERSE
+				else:
+					mode = curses.A_NORMAL
+
+				msg = '%s' % str(item[0])
+				self.win.addstr(3 + index, 1, msg, mode)
 
 def get_channel_list_window(stdscr):
 	return ChannelListWindow(stdscr)
@@ -39,6 +81,8 @@ class ChatWindow(object):
 			self.theme["prompt"]
 		)
 
+		self.win.border(*self.theme['chat-border'])
+
 		locale.setlocale(locale.LC_ALL, '')
 		self.code = locale.getpreferredencoding()
 
@@ -59,12 +103,7 @@ class ChatWindow(object):
 		self.show_all_messages()
 
 	def show_all_messages(self):
-		self.win.clear()
-		self.win.addstr(
-			self.input_field_y,
-			self.input_field_x - 1 - len(self.theme["prompt"]), 
-			self.theme["prompt"]
-		)
+		self.refresh_screen()
 
 		if self.selected_channel in self.chat_history.keys():
 			cur_course = self.chat_history[self.selected_channel]
@@ -82,7 +121,7 @@ class ChatWindow(object):
 	def get_input(self):
 		tmp = self.input
 		self.input = ''
-		self.refresh_screen()
+		self.refresh_input()
 
 		self.new_message({
 			"target": self.selected_channel, 
@@ -93,9 +132,18 @@ class ChatWindow(object):
 
 	def add_char(self, char):
 		self.input += char#.encode(self.code)
-		self.refresh_screen()
+		self.refresh_input()
 
 	def refresh_screen(self):
+		self.win.clear()
+		self.win.addstr(
+			self.input_field_y,
+			self.input_field_x - 1 - len(self.theme["prompt"]), 
+			self.theme["prompt"]
+		)
+		self.win.border(*self.theme['chat-border'])
+
+	def refresh_input(self):
 		self.win.addnstr(
 			self.input_field_y, self.input_field_x,
 			' ' * self.max_input_length if len(self.input) == 0 else self.input,

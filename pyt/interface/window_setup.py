@@ -8,10 +8,10 @@ from pyt.chat_handler import irc_wrapper
 def setup(stdscr):
 	def communicator(type, data):
 		if type == "add_item":
-			chan_win.menu.add_item(data)
-			if len(chan_win.menu.items) == 1:
+			chan_win.add_item(data)
+			if len(chan_win.items) == 1:
 				# TODO: do this the proper way
-				chat_win.update_selection(chan_win.menu.get_selection())
+				chat_win.update_selection(chan_win.get_selection())
 		elif type == "recv_msg":
 			chat_win.new_message(data)
 
@@ -33,14 +33,14 @@ def setup(stdscr):
 
 		# navigate menu
 		if key == curses.KEY_UP:
-			chan_win.menu.navigate(-1)
-			chat_win.update_selection(chan_win.menu.get_selection())
+			chan_win.navigate(-1)
+			chat_win.update_selection(chan_win.get_selection())
 		elif key == curses.KEY_DOWN:
-			chan_win.menu.navigate(1)
-			chat_win.update_selection(chan_win.menu.get_selection())
+			chan_win.navigate(1)
+			chat_win.update_selection(chan_win.get_selection())
 		# send message
 		elif key == curses.KEY_ENTER or key == ord('\n'):
-			irc_wrapper.send_privmsg(chat_win.get_input(), chan_win.menu.get_selection())
+			irc_wrapper.send_privmsg(chat_win.get_input(), chan_win.get_selection())
 		#write message
 		else:
 			chat_win.add_char(chr(key))
