@@ -31,9 +31,13 @@ class ChatWindow(object):
 		self.theme = loader.load_theme()
 
 		self.max_input_length = width - 20;
-		self.input_field_x = 2
+		self.input_field_x = len(self.theme["prompt"]) + 1
 		self.input_field_y = height - 2
-		self.win.addstr(self.input_field_y, self.input_field_x - 1, self.theme["prompt"])
+		self.win.addstr(
+			self.input_field_y,
+			self.input_field_x - 1 - len(self.theme["prompt"]), 
+			self.theme["prompt"]
+		)
 
 		locale.setlocale(locale.LC_ALL, '')
 		self.code = locale.getpreferredencoding()
@@ -56,7 +60,11 @@ class ChatWindow(object):
 
 	def show_all_messages(self):
 		self.win.clear()
-		self.win.addstr(self.input_field_y, self.input_field_x - 1, self.theme["prompt"])
+		self.win.addstr(
+			self.input_field_y,
+			self.input_field_x - 1 - len(self.theme["prompt"]), 
+			self.theme["prompt"]
+		)
 
 		if self.selected_channel in self.chat_history.keys():
 			cur_course = self.chat_history[self.selected_channel]
