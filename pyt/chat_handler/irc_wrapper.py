@@ -63,5 +63,3 @@ def init_connection(callback):
 		if data['type'] == 'irc':
 			login(data['nick'], None, server)
 	client.process_forever()
-
-init_connection(lambda x:x)
