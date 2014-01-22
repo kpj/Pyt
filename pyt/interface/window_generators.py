@@ -57,8 +57,8 @@ class ChatWindow(object):
 					self.max_input_length
 				)
 
-	def update_selection(self, sel):
-		self.selected_channel = sel
+	def update_selection(self, info):
+		self.selected_channel = info[0] # 0 -> channel, 1 -> server
 		self.show_all_messages()
 
 	def get_input(self):

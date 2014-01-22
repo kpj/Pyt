@@ -42,7 +42,7 @@ def join_channel(chan, server):
 	if irc.client.is_channel(chan):
 		servers[server]["conn"].join(chan)
 		servers[server].get("chans", []).append(chan)
-		communicator("add_item", chan)
+		communicator("add_item", (chan, server))
 
 # publicly accessible functions
 def login(username, passwd, server):
@@ -62,8 +62,14 @@ def get_channel_list(server):
 	except KeyError:
 		return []
 
-def send_privmsg(msg, chan, server):
-	servers[server]["conn"].privmsg(chan, msg)
+def send_privmsg(msg, info):
+	channel = info[0]
+	server = info[1]
+
+	for serv, data in servers.items():
+		if utils.get_domain(server) == utils.get_domain(serv):
+			servers[server]["conn"].privmsg(channel, msg)
+			break
 
 
 def init_connection(callback):

@@ -5,9 +5,6 @@ from pyt.interface import window_generators, utils
 from pyt.chat_handler import irc_wrapper
 
 
-serv = 'irc.freenode.net'
-
-
 def setup(stdscr):
 	def communicator(type, data):
 		if type == "add_item":
@@ -43,7 +40,7 @@ def setup(stdscr):
 			chat_win.update_selection(chan_win.menu.get_selection())
 		# send message
 		elif key == curses.KEY_ENTER or key == ord('\n'):
-			irc_wrapper.send_privmsg(chat_win.get_input(), chan_win.menu.get_selection(), serv)
+			irc_wrapper.send_privmsg(chat_win.get_input(), chan_win.menu.get_selection())
 		#write message
 		else:
 			chat_win.add_char(chr(key))

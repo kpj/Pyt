@@ -42,5 +42,5 @@ class Menu(object):
 				else:                                                        
 					mode = curses.A_NORMAL                                   
 
-				msg = '%s' % str(item)
+				msg = '%s' % str(item[0])
 				self.win.addstr(3 + index, 1, msg, mode)
