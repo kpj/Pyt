@@ -28,7 +28,14 @@ def _on_privmsg(conn, event):
 	pass
 
 def _on_pubmsg(conn, event):
-	communicator("recv_msg", {"sender": event.source, "msg": event.arguments[0]})
+	communicator(
+		"recv_msg",
+		{
+			"target": event.target, 
+			"sender": event.source, 
+			"msg": event.arguments[0]
+		}
+	)
 
 # other stuff
 def join_channel(chan, server):
@@ -67,3 +74,7 @@ def init_connection(callback):
 		if data['type'] == 'irc':
 			login(data['nick'], None, server)
 	client.process_forever()
+
+
+if __name__ == "__main__":
+	init_connection(lambda x, y: 42)

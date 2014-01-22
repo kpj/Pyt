@@ -23,7 +23,7 @@ class ChatWindow(object):
 		self.win = curses.newwin(height, width - 20, 0, 25)
 		self.win.immedok(True)
 
-		self.chat_history = []
+		self.chat_history = {}
 
 		self.input = ''
 
@@ -35,23 +35,42 @@ class ChatWindow(object):
 		locale.setlocale(locale.LC_ALL, '')
 		self.code = locale.getpreferredencoding()
 
-	def new_message(self, data):
-		self.chat_history.insert(0, '%s: %s' % (data["sender"], data["msg"]))
+		self.selected_channel = None
 
-		for i in range(len(self.chat_history)):
-			self.win.addnstr(
-				self.input_field_y - 2 - i, self.input_field_x,
-				self.chat_history[i],
-				self.max_input_length
-			)
+	def new_message(self, data=None):
+		if not data["target"] in self.chat_history.keys():
+			self.chat_history[data["target"]] = []
+		self.chat_history[data["target"]].insert(0, '%s: %s' % (data["sender"], data["msg"]))
+		
+		self.show_all_messages()
 
+	def show_all_messages(self):
+		self.win.clear()
+		self.win.addstr(self.input_field_y, self.input_field_x - 1, '_')
+
+		if self.selected_channel in self.chat_history.keys():
+			cur_course = self.chat_history[self.selected_channel]
+			for i in range(len(cur_course)):
+				self.win.addnstr(
+					self.input_field_y - 2 - i, self.input_field_x,
+					cur_course[i],
+					self.max_input_length
+				)
+
+	def update_selection(self, sel):
+		self.selected_channel = sel
+		self.show_all_messages()
 
 	def get_input(self):
 		tmp = self.input
 		self.input = ''
 		self.refresh_screen()
 
-		self.new_message({"sender": "Me", "msg": tmp})
+		self.new_message({
+			"target": self.selected_channel, 
+			"sender": "Me", 
+			"msg": tmp
+		})
 		return tmp
 
 	def add_char(self, char):
