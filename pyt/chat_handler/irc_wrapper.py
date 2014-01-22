@@ -25,15 +25,17 @@ def _on_disconnect(conn, event):
 	del servers[event.target]
 
 def _on_privmsg(conn, event):
-	print(event.source)
-	print(event.arguments)
+	pass
+
+def _on_pubmsg(conn, event):
+	communicator("recv_msg", {"sender": event.source, "msg": event.arguments[0]})
 
 # other stuff
 def join_channel(chan, server):
 	if irc.client.is_channel(chan):
 		servers[server]["conn"].join(chan)
 		servers[server].get("chans", []).append(chan)
-		add_channel_to_menu(chan)
+		communicator("add_item", chan)
 
 # publicly accessible functions
 def login(username, passwd, server):
@@ -44,6 +46,8 @@ def login(username, passwd, server):
 	servers[server]["conn"].add_global_handler("welcome", _on_connect)
 	servers[server]["conn"].add_global_handler("disconnect", _on_disconnect)
 	servers[server]["conn"].add_global_handler("privmsg", _on_privmsg)
+	servers[server]["conn"].add_global_handler("pubmsg", _on_pubmsg)
+
 
 def get_channel_list(server):
 	try:
@@ -56,8 +60,8 @@ def send_privmsg(msg, chan, server):
 
 
 def init_connection(callback):
-	global add_channel_to_menu
-	add_channel_to_menu = callback
+	global communicator
+	communicator = callback
 
 	for server, data in settings.items():
 		if data['type'] == 'irc':

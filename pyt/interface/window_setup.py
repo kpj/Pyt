@@ -7,7 +7,15 @@ from pyt.chat_handler import irc_wrapper
 
 serv = 'irc.freenode.net'
 
+
 def setup(stdscr):
+	def communicator(type, data):
+		if type == "add_item":
+			chan_win.menu.add_item(data)
+		elif type == "recv_msg":
+			chat_win.new_message(data)
+
+
 	curses.curs_set(0)
 
 	stdscr.immedok(True)
@@ -15,7 +23,7 @@ def setup(stdscr):
 
 	chan_win = window_generators.get_channel_list_window(stdscr)
 
-	utils.start_thread(irc_wrapper.init_connection, chan_win.menu.add_item) # irc thread
+	utils.start_thread(irc_wrapper.init_connection, communicator) # irc thread
 
 	chat_win = window_generators.get_chat_window(stdscr)
 
