@@ -43,7 +43,14 @@ class ChatWindow(object):
 	def new_message(self, data=None):
 		if not data["target"] in self.chat_history.keys():
 			self.chat_history[data["target"]] = []
-		self.chat_history[data["target"]].insert(0, self.theme["chat-line"] % (data["sender"], data["msg"]))
+		self.chat_history[data["target"]].insert(
+			0, 
+			self.theme["chat-line"] % (
+				utils.get_date(self.theme["date-format"]), 
+				data["sender"], 
+				data["msg"]
+			)
+		)
 		
 		self.show_all_messages()
 

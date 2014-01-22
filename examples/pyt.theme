@@ -1,2 +1,3 @@
 prompt: '_'
-chat-line: '%s: %s' # nick, msg
+chat-line: '[%s] %s: %s' # time, nick, msg
+date-format: '%Y-%m-%d %H:%M:%S'
