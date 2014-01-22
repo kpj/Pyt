@@ -19,5 +19,5 @@ setup(
 	test_suite='nose.collector',
 	tests_require=['nose'],
 	scripts=['bin/pyt'],
-	install_requires=['pyyaml', 'irc', 'tldextract']
+	install_requires=['pyyaml', 'irc', 'sleekxmpp']
 )
