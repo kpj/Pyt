@@ -49,8 +49,8 @@ def parse_command(msg, info):
 	pass
 
 def send_privmsg(msg, info):
-	# info[0] -> jid
-	client.sendMessage(info[0], msg)
+	# info['channel'] -> jid
+	client.sendMessage(info['channel'], msg)
 
 
 def init_connection(callback):
@@ -65,7 +65,14 @@ def init_connection(callback):
 	client.process()
 
 	for jid in get_channel_list():
-		communicator("add_item", (jid, None, 'xmpp'))
+		communicator(
+			"add_item", 
+			{
+				'channel': jid, 
+				'server': None,
+				'type': 'xmpp'
+			}
+		)
 
 
 if __name__ == "__main__":

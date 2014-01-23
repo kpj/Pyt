@@ -14,7 +14,7 @@ class StdoutWrapper(object):
 			self.callback(
 				"recv_msg",
 				{
-					'target': 'stdout',
+					'target': 'master',
 					'sender': 'system',
 					'msg': text
 				}

@@ -10,9 +10,9 @@ class IRCCmdHandler(object):
 		self.communicator = comm
 
 	def handle(self, cmd, info):
-		channel = info[0]
-		server = info[1]
-		typ = info[2]
+		channel = info['channel']
+		server = info['server']
+		typ = info['type']
 
 		if cmd == 'part':
 			self.servers[server]["conn"].part(channel, message='Pyt')

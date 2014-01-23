@@ -42,7 +42,7 @@ class ChannelListWindow(object):
 	def rm_item(self, name):
 		to_rm = ''
 		for item in self.items:
-			if item[0] == name:
+			if item['channel'] == name:
 				to_rm = item
 				break
 		self.items.remove(to_rm)
@@ -59,9 +59,9 @@ class ChannelListWindow(object):
 		self.win.border(*self.theme['channel-border'])
 
 		for index, item in enumerate(self.items):
-			name = item[0]
-			server = item[1]
-			typ = item[2]
+			name = item['channel']
+			server = item['server']
+			typ = item['type']
 
 			if index == self.pos:
 				mode = curses.A_REVERSE
@@ -127,8 +127,8 @@ class ChatWindow(object):
 					self.max_input_length
 				)
 
-	def update_selection(self, info):
-		self.selected_channel = info[0] # 0 -> channel, 1 -> server
+	def update_selection(self, data):
+		self.selected_channel = data['channel']
 		self.show_all_messages()
 
 	def get_input(self):

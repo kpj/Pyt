@@ -45,7 +45,14 @@ def join_channel(chan, server):
 		servers[server]["conn"].join(chan)
 		servers[server].get("chans", []).append(chan)
 		
-		communicator("add_item", (chan, server, 'irc'))
+		communicator(
+			"add_item", 
+			{
+				'channel': chan, 
+				'server': server,
+				'type': 'irc'
+			}
+		)
 
 # publicly accessible functions
 def login(username, passwd, server):
@@ -78,8 +85,8 @@ def parse_command(msg, info):
 	cmd_handler.handle(cmd, info)
 
 def send_privmsg(msg, info):
-	channel = info[0]
-	server = info[1]
+	channel = info['channel']
+	server = info['server']
 
 	for serv, data in servers.items():
 		if utils.get_domain(server) == utils.get_domain(serv):
