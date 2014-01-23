@@ -146,7 +146,7 @@ class ChatWindow(object):
 		return tmp
 
 	def add_char(self, char):
-		self.input += char#.encode(self.code)
+		self.input += char
 		self.refresh_input()
 
 	def rm_last_char(self):

@@ -4,6 +4,15 @@ from pyt.interface import window_generators, utils, constants
 from pyt.chat_handler import irc_wrapper, xmpp_wrapper
 
 
+def get_key(stdscr):
+	"""Workaround for weird Return handling of get_wch()
+	"""
+	key = stdscr.getch()
+	if key == 10:
+		return curses.KEY_ENTER
+	curses.ungetch(key)
+	return stdscr.get_wch()
+
 def setup(stdscr, stdout):
 	def communicator(typ, data):
 		if typ == "add_item":
@@ -56,7 +65,7 @@ def setup(stdscr, stdout):
 
 	# I/O thread
 	while 1:
-		key = stdscr.getch()
+		key = get_key(stdscr)
 
 		# navigate menu
 		if key == curses.KEY_UP:
@@ -82,4 +91,4 @@ def setup(stdscr, stdout):
 			chat_win.rm_last_char()
 		#write message
 		else:
-			chat_win.add_char(chr(key))
+			chat_win.add_char(key)
