@@ -1,4 +1,4 @@
-import irc.client, shlex
+import irc.client
 
 from pyt.config_handler import loader
 from pyt.chat_handler import utils
