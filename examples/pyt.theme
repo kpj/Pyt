@@ -1,4 +1,4 @@
-prompt: '-->'
+prompt: '--> '
 chat-line: '[%s] %s: %s' # time, nick, msg
 date-format: '%Y-%m-%d %H:%M:%S'
 chat-border: [0, ' ', 0, 0, 0, ' ', 0, ' ']
