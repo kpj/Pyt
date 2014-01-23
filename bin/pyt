@@ -1,9 +1,32 @@
 #!/bin/python3
 
-import curses
+import curses, sys
 
 from pyt.interface import window_setup
 
 
+class StdoutWrapper(object):
+	def __init__(self):
+		self.callback = None
+
+	def write(self, text):
+		if self.callback != None and len(text) != 0 and text != '\n':
+			self.callback(
+				"recv_msg",
+				{
+					'target': 'stdout',
+					'sender': 'system',
+					'msg': text
+				}
+			)
+
+	def set_callback(self, callback):
+		self.callback = callback
+
+
 if __name__ == '__main__':
-	curses.wrapper(window_setup.setup);
+	std = StdoutWrapper()
+	sys.stdout = std
+	sys.stderr = std
+
+	curses.wrapper(window_setup.setup, std);

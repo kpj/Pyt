@@ -5,7 +5,7 @@ from pyt.interface import window_generators, utils, constants
 from pyt.chat_handler import irc_wrapper, xmpp_wrapper
 
 
-def setup(stdscr):
+def setup(stdscr, stdout):
 	def communicator(type, data):
 		if type == "add_item":
 			chan_win.add_item(data)
@@ -22,11 +22,15 @@ def setup(stdscr):
 	constants.init_colors()
 
 	chan_win = window_generators.get_channel_list_window(stdscr)
+	chat_win = window_generators.get_chat_window(stdscr)
+
+	# add stdout/err channel
+	stdout.set_callback(communicator)
+	communicator("add_item", ('stdout', None, 'internal'))
 
 	utils.start_thread(irc_wrapper.init_connection, communicator) # irc thread
 	utils.start_thread(xmpp_wrapper.init_connection, communicator) # xmpp thread
 
-	chat_win = window_generators.get_chat_window(stdscr)
 
 	# I/O thread
 	while 1:

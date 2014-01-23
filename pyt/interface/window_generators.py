@@ -91,9 +91,10 @@ class ChatWindow(object):
 
 		self.selected_channel = None
 
-	def new_message(self, data=None):
+	def new_message(self, data):
 		if not data["target"] in self.chat_history.keys():
 			self.chat_history[data["target"]] = []
+			
 		self.chat_history[data["target"]].insert(
 			0, 
 			self.theme["chat-line"] % (
