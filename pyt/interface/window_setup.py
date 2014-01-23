@@ -91,4 +91,5 @@ def setup(stdscr, stdout):
 			chat_win.rm_last_char()
 		#write message
 		else:
-			chat_win.add_char(key)
+			if type(key) == type(''):
+				chat_win.add_char(key)
