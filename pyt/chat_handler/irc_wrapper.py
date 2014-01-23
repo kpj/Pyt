@@ -1,4 +1,5 @@
-import irc.client, socket
+import irc.client, irc.events
+import socket
 
 from pyt.config_handler import loader
 from pyt.chat_handler import utils
@@ -55,6 +56,19 @@ def _on_join(conn, event):
 			)
 			break
 
+def generic_print(conn, event):
+	source = event.source
+	arg = ' '.join(event.arguments)
+
+	communicator(
+		"recv_msg",
+		{
+			"target": "master", 
+			"sender": source, 
+			"msg": arg
+		}
+	)
+
 # other stuff
 def join_channel(chan, server):
 	if irc.client.is_channel(chan):
@@ -66,6 +80,10 @@ def login(username, passwd, server):
 	servers[server] = {}
 
 	servers[server]["conn"] = client.server().connect(server, 6667, username)
+
+	# add generic printing for everything
+	for val in irc.events.numeric.values():
+		servers[server]["conn"].add_global_handler(val, generic_print)
 
 	servers[server]["conn"].add_global_handler("welcome", _on_connect)
 	servers[server]["conn"].add_global_handler("disconnect", _on_disconnect)
