@@ -1,6 +1,6 @@
 import curses
 
-from pyt.interface import window_generators, utils
+from pyt.interface import window_generators, utils, constants
 
 from pyt.chat_handler import irc_wrapper, xmpp_wrapper
 
@@ -17,9 +17,9 @@ def setup(stdscr):
 
 
 	curses.curs_set(0) # disable cursor
-
 	stdscr.immedok(True)
 	stdscr.clear()
+	constants.init_colors()
 
 	chan_win = window_generators.get_channel_list_window(stdscr)
 
@@ -47,6 +47,9 @@ def setup(stdscr):
 				irc_wrapper.send_privmsg(chat_win.get_input(), sel)
 			elif typ == 'xmpp':
 				xmpp_wrapper.send_privmsg(chat_win.get_input(), sel)
+		# delet last char
+		elif key == curses.KEY_BACKSPACE:
+			chat_win.rm_last_char()
 		#write message
 		else:
 			chat_win.add_char(chr(key))

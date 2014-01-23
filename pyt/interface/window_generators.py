@@ -1,7 +1,7 @@
 import curses, locale
 from curses import panel
 
-from pyt.interface import utils
+from pyt.interface import utils, constants
 from pyt.config_handler import loader
 
 
@@ -50,12 +50,16 @@ class ChannelListWindow(object):
 		self.win.border(*self.theme['channel-border'])
 
 		for index, item in enumerate(self.items):
+			name = item[0]
+			server = item[1]
+			typ = item[2]
+
 			if index == self.pos:
 				mode = curses.A_REVERSE
 			else:
 				mode = curses.A_NORMAL
 
-			msg = '%s' % str(item[0])
+			msg = '%s' % str(name)
 			self.win.addstr(3 + index, 1, msg, mode)
 
 
@@ -135,6 +139,10 @@ class ChatWindow(object):
 		self.input += char#.encode(self.code)
 		self.refresh_input()
 
+	def rm_last_char(self):
+		self.input = self.input[:-1]
+		self.refresh_input()
+
 	def refresh_screen(self):
 		self.win.clear()
 
@@ -148,7 +156,7 @@ class ChatWindow(object):
 	def refresh_input(self):
 		self.win.addnstr(
 			self.input_field_y, self.input_field_x,
-			' ' * self.max_input_length if len(self.input) == 0 else self.input,
+			self.input + ' ' * (self.max_input_length - len(self.input)),
 			self.max_input_length
 		)
 
