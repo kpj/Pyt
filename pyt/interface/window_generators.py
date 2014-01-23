@@ -156,12 +156,12 @@ class ChatWindow(object):
 	def refresh_screen(self):
 		self.win.clear()
 
-		self.win.border(*self.theme['chat-border'])
 		self.win.addstr(
 			self.input_field_y,
 			self.input_field_x - len(self.theme["prompt"]), 
 			self.theme["prompt"]
 		)
+		self.win.border(*self.theme['chat-border'])
 
 	def refresh_input(self):
 		self.win.addnstr(
@@ -169,6 +169,7 @@ class ChatWindow(object):
 			self.input + ' ' * (self.max_input_length - len(self.input)),
 			self.max_input_length
 		)
+		self.win.border(*self.theme['chat-border'])
 
 
 def get_chat_window(stdscr):
