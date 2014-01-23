@@ -50,8 +50,8 @@ def setup(stdscr, stdout):
 		}
 	)
 
-	utils.start_thread(irc_wrapper.init_connection, communicator) # irc thread
-	utils.start_thread(xmpp_wrapper.init_connection, communicator) # xmpp thread
+	irc_thread = utils.start_thread(irc_wrapper.init_connection, communicator)
+	xmpp_thread = utils.start_thread(xmpp_wrapper.init_connection, communicator)
 
 
 	# I/O thread
@@ -77,7 +77,7 @@ def setup(stdscr, stdout):
 				xmpp_wrapper.parse_input(inp, sel)
 			elif typ == 'internal':
 				pass # handle internal commands
-		# delet last char
+		# delete last char
 		elif key == curses.KEY_BACKSPACE:
 			chat_win.rm_last_char()
 		#write message

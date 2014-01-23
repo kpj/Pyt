@@ -1,4 +1,4 @@
-import irc.client
+import irc.client, socket
 
 from pyt.config_handler import loader
 from pyt.chat_handler import utils
@@ -39,20 +39,27 @@ def _on_pubmsg(conn, event):
 		}
 	)
 
+def _on_join(conn, event):
+	channel = event.target
+	remote_addr = socket.gethostbyaddr(conn.socket.getpeername()[0])[0]
+
+	for server, data in settings.items():
+		if utils.get_domain(remote_addr) == utils.get_domain(server):
+			communicator(
+				"add_item", 
+				{
+					'channel': channel, 
+					'server': server,
+					'type': 'irc'
+				}
+			)
+			break
+
 # other stuff
 def join_channel(chan, server):
 	if irc.client.is_channel(chan):
 		servers[server]["conn"].join(chan)
 		servers[server].get("chans", []).append(chan)
-		
-		communicator(
-			"add_item", 
-			{
-				'channel': chan, 
-				'server': server,
-				'type': 'irc'
-			}
-		)
 
 # publicly accessible functions
 def login(username, passwd, server):
@@ -64,6 +71,7 @@ def login(username, passwd, server):
 	servers[server]["conn"].add_global_handler("disconnect", _on_disconnect)
 	servers[server]["conn"].add_global_handler("privmsg", _on_privmsg)
 	servers[server]["conn"].add_global_handler("pubmsg", _on_pubmsg)
+	servers[server]["conn"].add_global_handler("join", _on_join)
 
 
 def get_channel_list(server):
