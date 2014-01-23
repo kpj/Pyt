@@ -1,7 +1,8 @@
-import irc.client
+import irc.client, shlex
 
 from pyt.config_handler import loader
 from pyt.chat_handler import utils
+from pyt.command_handler import handler
 
 
 client = irc.client.IRC()
@@ -12,6 +13,7 @@ servers = {} # holds all connected servers and additional information
 #		"chans": [<chan name>, <chan name>]	
 #	}
 #}
+cmd_handler = handler.IRCCmdHandler(servers)
 settings = loader.load_config()
 
 # connection handling
@@ -63,6 +65,18 @@ def get_channel_list(server):
 	except KeyError:
 		return []
 
+def parse_input(msg, info):
+	if len(msg) == 0:
+		pass
+	elif msg[0] == '/':
+		parse_command(msg, info)
+	else:
+		send_privmsg(msg, info)
+
+def parse_command(msg, info):
+	cmd = msg[1:]
+	cmd_handler.handle(cmd, info)
+
 def send_privmsg(msg, info):
 	channel = info[0]
 	server = info[1]
@@ -76,6 +90,8 @@ def send_privmsg(msg, info):
 def init_connection(callback):
 	global communicator
 	communicator = callback
+
+	cmd_handler.set_communicator(communicator)
 
 	for server, data in settings.items():
 		if data['type'] == 'irc':

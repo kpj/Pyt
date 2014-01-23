@@ -39,6 +39,15 @@ class ChannelListWindow(object):
 		self.items.append(item)
 		self.display()
 
+	def rm_item(self, name):
+		to_rm = ''
+		for item in self.items:
+			if item[0] == name:
+				to_rm = item
+				break
+		self.items.remove(to_rm)
+		self.display()
+
 	def display(self):
 		self.panel.top()
 		self.panel.show()

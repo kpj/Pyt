@@ -23,6 +23,9 @@ class StdoutWrapper(object):
 	def set_callback(self, callback):
 		self.callback = callback
 
+	def flush(self):
+		pass
+
 
 if __name__ == '__main__':
 	std = StdoutWrapper()

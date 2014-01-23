@@ -6,14 +6,18 @@ from pyt.chat_handler import irc_wrapper, xmpp_wrapper
 
 
 def setup(stdscr, stdout):
-	def communicator(type, data):
-		if type == "add_item":
+	def communicator(typ, data):
+		if typ == "add_item":
 			chan_win.add_item(data)
 			if len(chan_win.items) == 1:
 				# TODO: do this the proper way
 				chat_win.update_selection(chan_win.get_selection())
-		elif type == "recv_msg":
+		elif typ == "rm_item":
+			chan_win.rm_item(data)
+		elif typ == "recv_msg":
 			chat_win.new_message(data)
+		else:
+			print('Unknown command: %s, %s' % (typ, str(data)))
 
 
 	curses.curs_set(0) # disable cursor
@@ -47,10 +51,14 @@ def setup(stdscr, stdout):
 		elif key == curses.KEY_ENTER or key == ord('\n'):
 			sel = chan_win.get_selection()
 			typ = sel[2]
+			inp = chat_win.get_input()
+
 			if typ == 'irc':
-				irc_wrapper.send_privmsg(chat_win.get_input(), sel)
+				irc_wrapper.parse_input(inp, sel)
 			elif typ == 'xmpp':
-				xmpp_wrapper.send_privmsg(chat_win.get_input(), sel)
+				xmpp_wrapper.parse_input(inp, sel)
+			elif typ == 'internal':
+				pass # handle internal commands
 		# delet last char
 		elif key == curses.KEY_BACKSPACE:
 			chat_win.rm_last_char()
