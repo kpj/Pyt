@@ -42,7 +42,8 @@ def join_channel(chan, server):
 	if irc.client.is_channel(chan):
 		servers[server]["conn"].join(chan)
 		servers[server].get("chans", []).append(chan)
-		communicator("add_item", (chan, server))
+		
+		communicator("add_item", (chan, server, 'irc'))
 
 # publicly accessible functions
 def login(username, passwd, server):

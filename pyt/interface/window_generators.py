@@ -8,7 +8,7 @@ from pyt.config_handler import loader
 class ChannelListWindow(object):
 	def __init__(self, stdscr):
 		(height, width) = stdscr.getmaxyx()
-		self.win = curses.newwin(height, 20, 0, 0)
+		self.win = curses.newwin(height, 40, 0, 0)
 		self.win.immedok(True)
 
 		self.panel = panel.new_panel(self.win)
@@ -21,7 +21,7 @@ class ChannelListWindow(object):
 
 		self.theme = loader.load_theme()
 
-		utils.start_thread(self.display) # new thread for channel list
+		self.display()
 
 	def navigate(self, shift):
 		self.pos += shift
@@ -30,11 +30,14 @@ class ChannelListWindow(object):
 		elif self.pos >= len(self.items):
 			self.pos = len(self.items) - 1
 
+		self.display()
+
 	def get_selection(self):
 		return self.items[self.pos]
 
 	def add_item(self, item):
 		self.items.append(item)
+		self.display()
 
 	def display(self):
 		self.panel.top()
@@ -42,24 +45,24 @@ class ChannelListWindow(object):
 		self.win.clear()
 
 		self.win.addstr(1, 1, self.title, curses.A_UNDERLINE)
-		while True:
-			self.win.refresh()
-			self.win.border(*self.theme['channel-border'])
+		
+		self.win.refresh()
+		self.win.border(*self.theme['channel-border'])
 
-			for index, item in enumerate(self.items):
-				if index == self.pos:
-					mode = curses.A_REVERSE
-				else:
-					mode = curses.A_NORMAL
+		for index, item in enumerate(self.items):
+			if index == self.pos:
+				mode = curses.A_REVERSE
+			else:
+				mode = curses.A_NORMAL
 
-				msg = '%s' % str(item[0])
-				self.win.addstr(3 + index, 1, msg, mode)
+			msg = '%s' % str(item[0])
+			self.win.addstr(3 + index, 1, msg, mode)
 
 
 class ChatWindow(object):
 	def __init__(self, stdscr):
 		(height, width) = stdscr.getmaxyx()
-		self.win = curses.newwin(height, width - 20, 0, 20)
+		self.win = curses.newwin(height, width - 40, 0, 40)
 		self.win.immedok(True)
 
 		self.chat_history = {}

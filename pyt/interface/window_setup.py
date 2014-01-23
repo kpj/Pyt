@@ -2,7 +2,7 @@ import curses
 
 from pyt.interface import window_generators, utils
 
-from pyt.chat_handler import irc_wrapper
+from pyt.chat_handler import irc_wrapper, xmpp_wrapper
 
 
 def setup(stdscr):
@@ -16,7 +16,7 @@ def setup(stdscr):
 			chat_win.new_message(data)
 
 
-	curses.curs_set(0)
+	curses.curs_set(0) # disable cursor
 
 	stdscr.immedok(True)
 	stdscr.clear()
@@ -24,6 +24,7 @@ def setup(stdscr):
 	chan_win = window_generators.get_channel_list_window(stdscr)
 
 	utils.start_thread(irc_wrapper.init_connection, communicator) # irc thread
+	utils.start_thread(xmpp_wrapper.init_connection, communicator) # xmpp thread
 
 	chat_win = window_generators.get_chat_window(stdscr)
 
@@ -40,7 +41,12 @@ def setup(stdscr):
 			chat_win.update_selection(chan_win.get_selection())
 		# send message
 		elif key == curses.KEY_ENTER or key == ord('\n'):
-			irc_wrapper.send_privmsg(chat_win.get_input(), chan_win.get_selection())
+			sel = chan_win.get_selection()
+			typ = sel[2]
+			if typ == 'irc':
+				irc_wrapper.send_privmsg(chat_win.get_input(), sel)
+			elif typ == 'xmpp':
+				xmpp_wrapper.send_privmsg(chat_win.get_input(), sel)
 		#write message
 		else:
 			chat_win.add_char(chr(key))
