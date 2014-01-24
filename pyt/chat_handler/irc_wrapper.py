@@ -25,7 +25,10 @@ def _on_connect(conn, event):
 				join_channel(chan, server)
 
 def _on_disconnect(conn, event):
-	del servers[event.target]
+	try:
+		del servers[event.target]
+	except KeyError:
+		print("[DEBUG] - Tried to delete nonexistent target")
 
 def _on_privmsg(conn, event):
 	pass
@@ -40,21 +43,57 @@ def _on_pubmsg(conn, event):
 		}
 	)
 
+def _on_part(conn, event):
+	channel = event.target
+	remote_addr = socket.gethostbyaddr(conn.socket.getpeername()[0])[0]
+
+	my_data = utils.get_entry(remote_addr, settings)
+	target_nick = utils.get_irc_username(event.source)
+
+	if my_data["nick"] != target_nick:
+		# someone else left channel
+		communicator(
+			"recv_msg",
+			{
+				"target": channel, 
+				"sender": channel, 
+				"msg": '%s left' % target_nick
+			}
+		)
+	else:
+		# I left channel - TODO: improve command handler
+		pass
+
 def _on_join(conn, event):
 	channel = event.target
 	remote_addr = socket.gethostbyaddr(conn.socket.getpeername()[0])[0]
 
-	for server, data in settings.items():
-		if utils.get_domain(remote_addr) == utils.get_domain(server):
-			communicator(
-				"add_item", 
-				{
-					'channel': channel, 
-					'server': server,
-					'type': 'irc'
-				}
-			)
-			break
+	my_data = utils.get_entry(remote_addr, settings)
+	target_nick = utils.get_irc_username(event.source)
+
+	if my_data["nick"] == target_nick:
+		# I joined channel
+		for server, data in settings.items():
+			if utils.get_domain(remote_addr) == utils.get_domain(server):
+				communicator(
+					"add_item", 
+					{
+						'channel': channel, 
+						'server': server,
+						'type': 'irc'
+					}
+				)
+				break
+	else:
+		# someone else joined channel
+		communicator(
+			"recv_msg",
+			{
+				"target": channel, 
+				"sender": channel, 
+				"msg": '%s joined' % target_nick
+			}
+		)
 
 def generic_print(conn, event):
 	source = event.source
@@ -85,11 +124,13 @@ def login(username, passwd, server):
 	for val in irc.events.numeric.values():
 		servers[server]["conn"].add_global_handler(val, generic_print)
 
+	# add some specific behaviours
 	servers[server]["conn"].add_global_handler("welcome", _on_connect)
 	servers[server]["conn"].add_global_handler("disconnect", _on_disconnect)
 	servers[server]["conn"].add_global_handler("privmsg", _on_privmsg)
 	servers[server]["conn"].add_global_handler("pubmsg", _on_pubmsg)
 	servers[server]["conn"].add_global_handler("join", _on_join)
+	servers[server]["conn"].add_global_handler("part", _on_part)
 
 
 def get_channel_list(server):
@@ -129,6 +170,7 @@ def init_connection(callback):
 	for server, data in settings.items():
 		if data['type'] == 'irc':
 			login(data['nick'], None, server)
+
 	client.process_forever()
 
 
