@@ -18,7 +18,7 @@ cmd_handler = handler.IRCCmdHandler(servers)
 settings = loader.load_config()
 
 # connection handling
-def _on_connect(conn, event):
+def _on_welcome(conn, event):
 	for server, data in settings.items():
 		if utils.get_domain(event.source) == utils.get_domain(server):
 			for chan in data['channels']:
@@ -118,20 +118,23 @@ def join_channel(chan, server):
 def login(username, passwd, server):
 	servers[server] = {}
 
-	servers[server]["conn"] = client.server().connect(server, 6667, username)
+	try:
+		servers[server]["conn"] = client.server().connect(server, 6667, username)
+	except irc.client.ServerConnectionError:
+		pass # TODO: handle error
+
 
 	# add generic printing for everything
 	for val in irc.events.numeric.values():
 		servers[server]["conn"].add_global_handler(val, generic_print)
 
 	# add some specific behaviours
-	servers[server]["conn"].add_global_handler("welcome", _on_connect)
-	servers[server]["conn"].add_global_handler("disconnect", _on_disconnect)
-	servers[server]["conn"].add_global_handler("privmsg", _on_privmsg)
-	servers[server]["conn"].add_global_handler("pubmsg", _on_pubmsg)
-	servers[server]["conn"].add_global_handler("join", _on_join)
-	servers[server]["conn"].add_global_handler("part", _on_part)
+	special_handlers = ["welcome", "disconnect", "privmsg", "pubmsg", "join", "part"]
+	for h in special_handlers:
+		servers[server]["conn"].remove_global_handler(h, generic_print)
 
+		func = globals()["_on_%s" % h]
+		servers[server]["conn"].add_global_handler(h, func)
 
 def get_channel_list(server):
 	try:
