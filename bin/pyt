@@ -9,7 +9,17 @@ class StdoutWrapper(object):
 	def __init__(self):
 		self.callback = None
 
+		self.write_to_file = False
+
+		if self.write_to_file:
+			self.log_file = 'pyt.log'
+			open(self.log_file, 'w').close() # clear contents of log file
+
 	def write(self, text):
+		if self.write_to_file:
+			with open(self.log_file, "a") as fd:
+				fd.write(text + "\n")
+
 		if self.callback != None and len(text) != 0 and text != '\n':
 			self.callback(
 				"recv_msg",
