@@ -106,11 +106,11 @@ class ChatWindow(object):
 			
 		self.chat_history[data["target"]].insert(
 			0, 
-			self.theme["chat-line"] % (
-				utils.get_date(self.theme["date-format"]), 
-				data["sender"], 
-				data["msg"]
-			)
+			self.theme["chat-line"] % {
+				'time': utils.get_date(self.theme["date-format"]), 
+				'username': data["sender"], 
+				'message': data["msg"]
+			}
 		)
 		
 		self.show_all_messages()
